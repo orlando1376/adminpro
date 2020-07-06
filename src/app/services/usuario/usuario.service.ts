@@ -97,7 +97,11 @@ export class UsuarioService {
 
     return this.http.put( url, usuario )
       .map( (resp: any) => {
-        this.guardarStorage(resp.usuario._id, this.token, resp.usuario);
+        // si el usuario a actualizar es el mismo que está logueado
+        if ( usuario._id === this.usuario._id) {
+          this.guardarStorage(resp.usuario._id, this.token, resp.usuario);
+        }
+
         Swal.fire({title: 'Usuario actualizado', text: usuario.nombre + ' ' + usuario.apellido, icon: 'success'});
         return true;
       });
@@ -112,6 +116,26 @@ export class UsuarioService {
       })
       .catch( resp => {
         console.log(resp);
+      });
+  }
+
+  cargarUsuarios( desde: number = 0 ) {
+    const url = URL_SERVICES + '/usuario?desde=' + desde;
+    return this.http.get( url );
+  }
+
+  buscarUsuarios( valor: string ) {
+    const url = URL_SERVICES + '/busqueda/coleccion/usuarios/' + valor;
+    return this.http.get( url )
+      .map( (resp: any) => resp.usuarios );
+  }
+
+  borrarUsuario( id: string ) {
+    const url = URL_SERVICES + '/usuario/' + id + '?token=' + this.token;
+    return this.http.delete( url )
+      .map( resp => {
+        Swal.fire({title: 'Usuario borrado', text: 'El usuario a sido borrado correctamente.', icon: 'success'});
+        return true;
       });
   }
 

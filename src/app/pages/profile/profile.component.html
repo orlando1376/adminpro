@@ -40,7 +40,6 @@
         <div class="card" align="center">
             <div class="card-body">
                 <h4 class="card-title">Fotografía del usuario</h4>
-                <h6 class="card-subtitle">nombre de usuario</h6>
                 <img *ngIf="!imagenTemp" [src]="usuario.img | imagen" class="w150">
                 <img *ngIf="imagenTemp" [src]="imagenTemp" class="w150">
 
