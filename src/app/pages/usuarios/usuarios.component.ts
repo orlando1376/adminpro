@@ -80,7 +80,7 @@ export class UsuariosComponent implements OnInit {
 
     Swal.fire({
       title: '¿Está seguro?',
-      text: 'Está a punto de borrara a: ' + usuario.nombre + ' ' + usuario.apellido,
+      text: 'Está a punto de borrar el usuario: ' + usuario.nombre + ' ' + usuario.apellido,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
