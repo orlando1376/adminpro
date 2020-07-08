@@ -24,6 +24,7 @@ import { HospitalesComponent } from './hospitales/hospitales.component';
 import { MedicosComponent } from './medicos/medicos.component';
 import { MedicoComponent } from './medicos/medico.component';
 import { BrowserModule } from '@angular/platform-browser';
+import { BusquedaComponent } from './busqueda/busqueda.component';
 
 @NgModule({
     declarations: [
@@ -41,7 +42,8 @@ import { BrowserModule } from '@angular/platform-browser';
         ModalUploadComponent,
         HospitalesComponent,
         MedicosComponent,
-        MedicoComponent
+        MedicoComponent,
+        BusquedaComponent
     ],
     exports: [
         DashboardComponent,

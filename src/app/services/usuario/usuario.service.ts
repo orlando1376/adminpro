@@ -3,6 +3,9 @@ import { Usuario } from '../../models/usuario.model';
 import { HttpClient} from '@angular/common/http';
 import { URL_SERVICES } from 'src/app/config/config';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+// import { Observable } from 'rxjs/Observable';
+import {from, Observable, empty, throwError} from 'rxjs';
 // import { map } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
@@ -13,6 +16,7 @@ export class UsuarioService {
 
   usuario: Usuario;
   token: string;
+  menu: any[] = [];
 
   constructor(
     public http: HttpClient,
@@ -30,26 +34,32 @@ export class UsuarioService {
     if (localStorage.getItem('token')) {
       this.token = localStorage.getItem('token');
       this.usuario = JSON.parse( localStorage.getItem('usuario') );
+      this.menu = JSON.parse( localStorage.getItem('menu') );
     } else {
       this.token = '';
       this.usuario = null;
+      this.menu = [];
     }
   }
 
-  guardarStorage( id: string, token: string, usuario: Usuario ) {
+  guardarStorage( id: string, token: string, usuario: Usuario, menu: any) {
     localStorage.setItem('id', id);
     localStorage.setItem('token', token);
     localStorage.setItem('usuario', JSON.stringify(usuario));
+    localStorage.setItem('menu', JSON.stringify(menu));
 
     this.usuario = usuario;
     this.token = token;
+    this.menu = menu;
   }
 
   logout() {
     this.token = '';
     this.usuario = null;
+    this.menu = [];
     localStorage.removeItem('usuario');
     localStorage.removeItem('token');
+    localStorage.removeItem('menu');
 
     this.router.navigate(['/login']);
   }
@@ -59,8 +69,7 @@ export class UsuarioService {
 
     return this.http.post( url, {token} )
       .map( (resp: any) => {
-        this.guardarStorage(resp.id, resp.token, resp.usuario);
-
+        this.guardarStorage(resp.id, resp.token, resp.usuario, resp.menu);
         return true;
       });
   }
@@ -76,9 +85,12 @@ export class UsuarioService {
 
     return this.http.post( url, usuario )
       .map( (resp: any) => {
-        this.guardarStorage(resp.id, resp.token, resp.usuario);
-
+        this.guardarStorage(resp.id, resp.token, resp.usuario, resp.menu);
         return true;
+      })
+      .catch ( err => {
+        Swal.fire({title: 'Error en el login', text: err.error.mensaje, icon: 'error'});
+        return throwError(err);
       });
   }
 
@@ -89,6 +101,10 @@ export class UsuarioService {
       .map( (resp: any) => {
         Swal.fire({title: 'Usuario creado', text: usuario.nombre + ' ' + usuario.apellido, icon: 'success'});
         return resp.usuario;
+      })
+      .catch ( err => {
+        Swal.fire({title: err.error.mensaje, text: err.error.errors.message, icon: 'error'});
+        return throwError(err);
       });
   }
 
@@ -99,11 +115,15 @@ export class UsuarioService {
       .map( (resp: any) => {
         // si el usuario a actualizar es el mismo que está logueado
         if ( usuario._id === this.usuario._id) {
-          this.guardarStorage(resp.usuario._id, this.token, resp.usuario);
+          this.guardarStorage(resp.usuario._id, this.token, resp.usuario, this.menu);
         }
 
         Swal.fire({title: 'Usuario actualizado', text: usuario.nombre + ' ' + usuario.apellido, icon: 'success'});
         return true;
+      })
+      .catch ( err => {
+        Swal.fire({title: err.error.mensaje, text: err.error.errors.message, icon: 'error'});
+        return throwError(err);
       });
   }
 
@@ -111,11 +131,11 @@ export class UsuarioService {
     this._subirArchivoService.subirArchivo( archivo, 'usuarios', id )
       .then( (resp: any) => {
         this.usuario.img = resp.usuario.img;
-        this.guardarStorage(id, this.token, resp.usuario);
+        this.guardarStorage(id, this.token, resp.usuario, this.menu);
         Swal.fire({title: 'Imagen actualizada', text: this.usuario.nombre + ' ' + this.usuario.apellido, icon: 'success'});
       })
       .catch( resp => {
-        console.log(resp);
+        Swal.fire({title: 'Error al actualizar imagen', text: resp.mensaje, icon: 'success'});
       });
   }
 
