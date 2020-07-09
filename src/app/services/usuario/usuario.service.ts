@@ -6,7 +6,6 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 // import { Observable } from 'rxjs/Observable';
 import {from, Observable, empty, throwError} from 'rxjs';
-// import { map } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { SubirArchivoService } from '../subir-archivo/subir-archivo.service';
@@ -24,6 +23,23 @@ export class UsuarioService {
     public _subirArchivoService: SubirArchivoService
   ) {
     this.cargarStorage();
+  }
+
+  renuevaToken() {
+    const url = URL_SERVICES + '/login/renuevatoken?token=' + this.token;
+
+    return this.http.get( url )
+      .map( (resp: any) => {
+        this.token = resp.token;
+        localStorage.setItem('token', this.token );
+        console.log('Token renovado');
+        return true;
+      })
+      .catch ( err => {
+        this.router.navigate(['/login']);
+        Swal.fire({title: 'No se pudo renovar token', text: 'No fue posible renovar token', icon: 'error'});
+        return throwError(err);
+      });
   }
 
   estaLogueado() {
