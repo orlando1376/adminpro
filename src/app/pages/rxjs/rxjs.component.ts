@@ -11,7 +11,8 @@ export class RxjsComponent implements OnInit, OnDestroy {
   subscription: Subscription;
 
   constructor() {
-    this.subscription = this.regresaObservable().pipe(
+    this.subscription = this.regresaObservable()
+    .pipe(
       // retry(2) // reintentar 2 veces
     )
     .subscribe(
@@ -50,7 +51,7 @@ export class RxjsComponent implements OnInit, OnDestroy {
         //   observable.error('Auxilio');
         // }
 
-      }, 1000);
+      }, 500);
     }).pipe(
       map( resp => resp.valor ), // transformar respuesta
       filter( ( valor, index ) => {
